@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/action_select_all"
+        android:icon="@drawable/select_all"
+        android:title="Выбрать все" />
+
+    <item
+        android:id="@+id/action_menu"
+        android:icon="@drawable/menu_24"
+        android:title="Карточки" />
+
+    <item
+        android:id="@+id/action_close"
+        android:icon="@drawable/close_24"
+        android:title="Закрыть" />
+
+</menu>

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/navgraph"
+    app:startDestination="@id/mainSwipeFragment">
+
+    <fragment
+        android:id="@+id/mainSwipeFragment"
+        android:name="raf.console.counter.ui.counter.main.MainSwipeFragment"
+        android:label=""
+        tools:layout="@layout/fragment_main_swipe" >
+        <action
+            android:id="@+id/action_mainSwipeFragment_to_gestureCounterFragment"
+            app:destination="@id/gestureCounterFragment" />
+        <action
+            android:id="@+id/action_mainSwipeFragment_to_appAboutFragment2"
+            app:destination="@id/appAboutFragment2" />
+    </fragment>
+    <fragment
+        android:id="@+id/gestureCounterFragment"
+        android:name="raf.console.counter.ui.counter.fragment.GestureCounterFragment"
+        android:label=""
+        tools:layout="@layout/fragment_gesture_counter" >
+        <action
+            android:id="@+id/action_gestureCounterFragment_to_appAboutFragment2"
+            app:destination="@id/appAboutFragment2" />
+        <action
+            android:id="@+id/action_gestureCounterFragment_to_mainSwipeFragment"
+            app:destination="@id/mainSwipeFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/appAboutFragment2"
+        android:name="raf.console.counter.ui.about_app.AppAboutFragment"
+        android:label=""
+        tools:layout="@layout/fragment_app_about" >
+        <action
+            android:id="@+id/action_appAboutFragment2_to_settingsFragment2"
+            app:destination="@id/settingsFragment2" />
+    </fragment>
+    <fragment
+        android:id="@+id/settingsFragment2"
+        android:name="raf.console.counter.ui.settings.SettingsFragment"
+        android:label=""
+        tools:layout="@layout/fragment_settings" />
+</navigation>
