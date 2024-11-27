@@ -187,7 +187,7 @@
                                 android:text="Мы в VK"
                                 android:textAlignment="textStart"
                                 android:textSize="20sp"
-                                app:icon="@drawable/i_vk"
+                                app:icon="@drawable/vk_fill_svgrepo_com"
                                 app:iconPadding="16dp"
                                 app:iconSize="24dp" />
 
@@ -199,7 +199,7 @@
                                 android:text="Мы в Telegram"
                                 android:textAlignment="textStart"
                                 android:textSize="20sp"
-                                app:icon="@drawable/i_tg"
+                                app:icon="@drawable/telegram_circled_svgrepo_com"
                                 app:iconPadding="16dp"
                                 app:iconSize="24dp" />
                             <com.google.android.material.button.MaterialButton
@@ -208,7 +208,7 @@
                                 android:layout_height="wrap_content"
                                 android:text="Другие Приложения"
                                 android:textSize="20sp"
-                                app:icon="@drawable/baseline_apps_24"
+                                app:icon="@drawable/rustore_2"
                                 app:iconPadding="16dp"
                                 app:iconSize="24dp"
                                 android:textAlignment="textStart"

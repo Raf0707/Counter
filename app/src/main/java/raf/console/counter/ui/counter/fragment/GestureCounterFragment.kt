@@ -208,7 +208,7 @@ class GestureCounterFragment : Fragment() {
         }
 
         binding.counterGestureView.setOnTouchListener(object : OnSwipeTouchListener(binding.counterGestureView.context) {
-            @SuppressLint("MissingPermission")
+
             override fun onClick() {
                 vibrator.vibrate(50)
                 counter++
@@ -219,24 +219,36 @@ class GestureCounterFragment : Fragment() {
                     vibrator.vibrate(1000)
                     Snackbar.make(requireView(), "Цель достигнута! Да вознаградит вас Аллах!", Snackbar.LENGTH_LONG).show()
                 }
+                counterItem.title = binding.counterTitle.text.toString()
+                counterItem.target = binding.counterTarget.text.toString().toInt()
+                counterItem.progress = binding.gestureCounter.text.toString().toInt()
                 counterViewModel.update(counterItem)
+                observeCounter()
             }
 
-            @SuppressLint("MissingPermission")
+
             override fun onSwipeDown() {
                 vibrator.vibrate(50)
                 counter--
                 binding.gestureCounter.text = counter.toString()
+                counterItem.title = binding.counterTitle.text.toString()
+                counterItem.target = binding.counterTarget.text.toString().toInt()
+                counterItem.progress = binding.gestureCounter.text.toString().toInt()
                 saveCounterItem()
                 counterViewModel.update(counterItem)
+                observeCounter()
             }
 
-            @SuppressLint("MissingPermission")
+
             override fun onLongClick() {
                 vibrator.vibrate(200)
                 if (counter != 0) onResetCounterAlert()
                 saveCounterItem()
+                counterItem.title = binding.counterTitle.text.toString()
+                counterItem.target = binding.counterTarget.text.toString().toInt()
+                counterItem.progress = binding.gestureCounter.text.toString().toInt()
                 counterViewModel.update(counterItem)
+                observeCounter()
             }
         })
     }
@@ -311,7 +323,6 @@ class GestureCounterFragment : Fragment() {
     }
 
 
-    @SuppressLint("MissingPermission")
     private fun onResetCounterAlert() {
         MaterialAlertDialogBuilder(requireContext(), R.style.AlertDialogTheme)
             .setTitle("Reset")
@@ -323,6 +334,10 @@ class GestureCounterFragment : Fragment() {
             }
             .setNeutralButton("Отмена") { dialog, _ -> dialog.cancel() }
             .show()
+
+        saveCounterItem()
+        counterViewModel.update(counterItem)
+        observeCounter()
     }
 
     private fun tutorialCounterAlert() {

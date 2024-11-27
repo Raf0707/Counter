@@ -4,6 +4,7 @@ import android.content.res.Configuration
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import android.view.Window
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -69,6 +70,17 @@ class MainActivity : AppCompatActivity() {
 
         // Инициализация AppBarConfiguration для toolbar (если он есть)
         appBarConfiguration = AppBarConfiguration.Builder(navController.graph).build()
+
+        navController.addOnDestinationChangedListener { _, destination, _ ->
+            if (destination.id == R.id.gestureCounterFragment) {
+                binding.toolbar.visibility = View.GONE
+                supportActionBar?.hide()
+            } else {
+                binding.toolbar.visibility = View.VISIBLE
+                supportActionBar?.show()
+            }
+        }
+
 
         /*appBarConfiguration = AppBarConfiguration(
             setOf(R.id.mainSwipeFragment, R.id.appAboutFragment)
