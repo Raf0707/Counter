@@ -5,12 +5,14 @@ import android.content.Context
 import android.os.Bundle
 import android.os.Handler
 import android.os.Vibrator
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
 import androidx.activity.OnBackPressedCallback
+import androidx.appcompat.widget.TooltipCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
@@ -90,6 +92,14 @@ class GestureCounterFragment : Fragment() {
 
         handler = Handler()
 
+        binding.counterTarget.isCursorVisible = false
+        binding.counterTarget.isFocusableInTouchMode = false
+        binding.counterTarget.isEnabled = false
+
+        binding.counterTitle.isCursorVisible = false
+        binding.counterTitle.isFocusableInTouchMode = false
+        binding.counterTitle.isEnabled = false
+
         setupListeners()
 
         requireActivity().onBackPressedDispatcher.addCallback(
@@ -104,7 +114,6 @@ class GestureCounterFragment : Fragment() {
             }
         )
 
-
         return binding.root
     }
 
@@ -114,16 +123,37 @@ class GestureCounterFragment : Fragment() {
             removeCounterAlert()
         }
 
+        binding.deleteCounter.setOnLongClickListener {v ->
+            TooltipCompat.setTooltipText(
+                binding.deleteCounter, "Удалить счетчик"
+            );
+            false
+        }
+
         binding.openCounterListBtn.setOnClickListener {
             navController.navigate(R.id.action_gestureCounterFragment_to_mainSwipeFragment)
             saveCounterItem()
             counterViewModel.update(counterItem)
         }
 
+        binding.openCounterListBtn.setOnLongClickListener {v ->
+            TooltipCompat.setTooltipText(
+                binding.openCounterListBtn, "К списку счетчиков"
+            );
+            false
+        }
+
         binding.openTutorialBtn.setOnClickListener {
             tutorialCounterAlert()
             saveCounterItem()
             counterViewModel.update(counterItem)
+        }
+
+        binding.openTutorialBtn.setOnLongClickListener {v ->
+            TooltipCompat.setTooltipText(
+                binding.openTutorialBtn, "Жесты счетчика"
+            );
+            false
         }
 
         binding.editCounter.setOnClickListener {
@@ -207,48 +237,44 @@ class GestureCounterFragment : Fragment() {
             }
         }
 
-        binding.counterGestureView.setOnTouchListener(object : OnSwipeTouchListener(binding.counterGestureView.context) {
+        binding.editCounter.setOnLongClickListener {v ->
+            TooltipCompat.setTooltipText(
+                binding.editCounter, "Режим изменения счетчика"
+            );
+            false
+        }
 
+        binding.counterGestureView.setOnTouchListener(object : OnSwipeTouchListener(binding.counterGestureView.context) {
+            @SuppressLint("MissingPermission")
             override fun onClick() {
                 vibrator.vibrate(50)
                 counter++
                 binding.gestureCounter.text = counter.toString()
                 saveCounterItem()
+                counterViewModel.update(counterItem)
 
                 if (counter == binding.counterTarget.text.toString().toInt()) {
                     vibrator.vibrate(1000)
                     Snackbar.make(requireView(), "Цель достигнута! Да вознаградит вас Аллах!", Snackbar.LENGTH_LONG).show()
                 }
-                counterItem.title = binding.counterTitle.text.toString()
-                counterItem.target = binding.counterTarget.text.toString().toInt()
-                counterItem.progress = binding.gestureCounter.text.toString().toInt()
                 counterViewModel.update(counterItem)
-                observeCounter()
             }
 
-
+            @SuppressLint("MissingPermission")
             override fun onSwipeDown() {
                 vibrator.vibrate(50)
                 counter--
                 binding.gestureCounter.text = counter.toString()
-                counterItem.title = binding.counterTitle.text.toString()
-                counterItem.target = binding.counterTarget.text.toString().toInt()
-                counterItem.progress = binding.gestureCounter.text.toString().toInt()
                 saveCounterItem()
                 counterViewModel.update(counterItem)
-                observeCounter()
             }
 
-
+            @SuppressLint("MissingPermission")
             override fun onLongClick() {
                 vibrator.vibrate(200)
                 if (counter != 0) onResetCounterAlert()
                 saveCounterItem()
-                counterItem.title = binding.counterTitle.text.toString()
-                counterItem.target = binding.counterTarget.text.toString().toInt()
-                counterItem.progress = binding.gestureCounter.text.toString().toInt()
                 counterViewModel.update(counterItem)
-                observeCounter()
             }
         })
     }
@@ -264,12 +290,10 @@ class GestureCounterFragment : Fragment() {
             target = binding.counterTarget.text.toString().toInt()
             progress = counter
         }
-
         counterViewModel = ViewModelProvider(
             this,
             ViewModelProvider.AndroidViewModelFactory.getInstance(requireActivity().application)
         ).get(CounterViewModel::class.java)
-
         counterViewModel.currentCounter?.observe(viewLifecycleOwner) { item ->
             item?.let {
                 binding.counterTitle.setText(it.title)
@@ -278,51 +302,28 @@ class GestureCounterFragment : Fragment() {
                 binding.gestureCounter.text = counter.toString()
             }
         }
-
         // saveText()
-
         counterViewModel.update(counterItem)
     }*/
 
     private fun saveCounterItem() {
-        // Обновляем данные counterItem из текущих значений интерфейса
+        if (!::counterItem.isInitialized) {
+            val title = binding.counterTitle.text.toString()
+            val target = binding.counterTarget.text.toString().toIntOrNull() ?: 10
+            counterItem = CounterItem(0, title, target, counter)
+        }
+
         counterItem.apply {
             title = binding.counterTitle.text.toString()
-            target = binding.counterTarget.text.toString().toIntOrNull() ?: 0 // Обработка некорректного ввода
+            target = binding.counterTarget.text.toString().toIntOrNull() ?: 10
             progress = counter
         }
 
-        // Получаем ViewModel только один раз, чтобы избежать повторного создания
-        if (!::counterViewModel.isInitialized) {
-            counterViewModel = ViewModelProvider(
-                requireActivity(),
-                ViewModelProvider.AndroidViewModelFactory.getInstance(requireActivity().application)
-            ).get(CounterViewModel::class.java)
-        }
-
-        // Сохраняем изменения через ViewModel
         counterViewModel.update(counterItem)
-        counterViewModel.currentCounter?.value?.let {
-            binding.counterTitle.setText(it.title)
-            binding.counterTarget.setText(it.target.toString())
-            counter = it.progress
-            binding.gestureCounter.text = counter.toString()
-        }
-
-
-        // Обновляем UI, если ViewModel изменилась
-        counterViewModel.currentCounter?.removeObservers(viewLifecycleOwner) // Убираем старых наблюдателей
-        counterViewModel.currentCounter?.observe(viewLifecycleOwner) { item ->
-            item?.let {
-                binding.counterTitle.setText(it.title)
-                binding.counterTarget.setText(it.target.toString())
-                counter = it.progress
-                binding.gestureCounter.text = counter.toString()
-            }
-        }
     }
 
 
+    @SuppressLint("MissingPermission")
     private fun onResetCounterAlert() {
         MaterialAlertDialogBuilder(requireContext(), R.style.AlertDialogTheme)
             .setTitle("Reset")
@@ -334,10 +335,6 @@ class GestureCounterFragment : Fragment() {
             }
             .setNeutralButton("Отмена") { dialog, _ -> dialog.cancel() }
             .show()
-
-        saveCounterItem()
-        counterViewModel.update(counterItem)
-        observeCounter()
     }
 
     private fun tutorialCounterAlert() {
@@ -390,70 +387,4 @@ class GestureCounterFragment : Fragment() {
         observeCounter() // Подписка на обновления данных ViewModel
     }
 
-    override fun onSaveInstanceState(outState: Bundle) {
-
-        super.onSaveInstanceState(outState)
-        saveCounterItem()
-        observeCounter()
-
-        outState.putString("counterTitle", binding.counterTitle.text.toString())
-        outState.putInt("counterTarget", binding.counterTarget.text.toString().toIntOrNull() ?: 0)
-        outState.putInt("counter", counter)
-    }
-
-    override fun onViewStateRestored(savedInstanceState: Bundle?) {
-        super.onViewStateRestored(savedInstanceState)
-        if (savedInstanceState != null) {
-            // Восстанавливаем данные из Bundle
-            binding.counterTitle.setText(savedInstanceState.getString("counterTitle"))
-            binding.counterTarget.setText(savedInstanceState.getInt("counterTarget").toString())
-            counter = savedInstanceState.getInt("counter")
-            binding.gestureCounter.text = counter.toString()
-        }
-        saveCounterItem()
-        observeCounter()
-    }
-
-
-    override fun onStop() {
-
-        super.onStop()
-        saveCounterItem()
-        observeCounter()
-    }
-
-    override fun onPause() {
-
-        super.onPause()
-        saveCounterItem()
-        observeCounter()
-    }
-
-    override fun onResume() {
-
-        super.onResume()
-        saveCounterItem()
-        observeCounter()
-    }
-
-    override fun onDestroyView() {
-
-        super.onDestroyView()
-        saveCounterItem()
-        observeCounter()
-    }
-
-    override fun onDestroy() {
-
-        super.onDestroy()
-        saveCounterItem()
-        observeCounter()
-    }
-
-    override fun onDetach() {
-
-        super.onDetach()
-        saveCounterItem()
-        observeCounter()
-    }
 }

@@ -14,6 +14,7 @@ import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.SearchView
 import android.widget.TextView
+import androidx.appcompat.widget.TooltipCompat
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
@@ -89,6 +90,13 @@ class MainSwipeFragment : Fragment(), CounterAdapter.HandleCounterClick {
 
         binding.searchCounters.setOnClickListener {
             binding.searchCounters.clearFocus()
+        }
+
+        binding.fabAddCounter.setOnLongClickListener {v ->
+            TooltipCompat.setTooltipText(
+                binding.fabAddCounter, "Создать новый счетчик"
+            );
+            false
         }
 
         initRecycleView()
