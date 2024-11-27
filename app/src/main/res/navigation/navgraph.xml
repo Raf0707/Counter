@@ -28,6 +28,9 @@
         <action
             android:id="@+id/action_gestureCounterFragment_to_mainSwipeFragment"
             app:destination="@id/mainSwipeFragment" />
+        <action
+            android:id="@+id/action_gestureCounterFragment_to_settingsFragment2"
+            app:destination="@id/settingsFragment2" />
     </fragment>
     <fragment
         android:id="@+id/appAboutFragment2"

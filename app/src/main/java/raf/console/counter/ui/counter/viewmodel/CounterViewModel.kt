@@ -10,6 +10,7 @@ import raf.console.counter.domain.repository.CounterRepository
 class CounterViewModel(application: Application) : AndroidViewModel(application) {
     private val counterlist: LiveData<List<CounterItem>>
     private val counterRepository: CounterRepository
+    val counterlistObserver1 = MutableLiveData<List<CounterItem>>()
 
     var currentCounter: MutableLiveData<CounterItem>? = null
 

@@ -10,6 +10,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
+import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
@@ -17,6 +18,7 @@ import androidx.navigation.fragment.findNavController
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import raf.console.counter.R
+import raf.console.counter.adapters.CounterAdapter
 import raf.console.counter.databinding.FragmentGestureCounterBinding
 import raf.console.counter.domain.models.CounterItem
 import raf.console.counter.ui.counter.viewmodel.CounterViewModel
@@ -44,13 +46,22 @@ class GestureCounterFragment : Fragment() {
         binding = FragmentGestureCounterBinding.inflate(inflater, container, false)
 
         // ViewModel initialization
-        counterViewModel = ViewModelProvider(
-            this,
-            ViewModelProvider.AndroidViewModelFactory.getInstance(requireActivity().application)
-        ).get(CounterViewModel::class.java)
+//        counterViewModel = ViewModelProvider(
+//            this,
+//            ViewModelProvider.AndroidViewModelFactory.getInstance(requireActivity().application)
+//        ).get(CounterViewModel::class.java)
 
         // NavController initialization
         navController = findNavController()
+
+        /*counterViewModel = ViewModelProvider(
+            requireActivity(),
+            ViewModelProvider.AndroidViewModelFactory.getInstance(requireActivity().application)
+        ).get(CounterViewModel::class.java)*/
+
+        counterViewModel = ViewModelProvider(this)[CounterViewModel::class.java]
+
+
 
         arguments?.let {
             val title = it.getString("title")
@@ -66,21 +77,38 @@ class GestureCounterFragment : Fragment() {
             counterItem = CounterItem(id, title ?: "", target, progress)
         }
 
+        counterViewModel.currentCounter?.observe(viewLifecycleOwner) { item ->
+            item?.let {
+                binding.counterTitle.setText(it.title)
+                binding.counterTarget.setText(it.target.toString())
+                counter = it.progress
+                binding.gestureCounter.text = counter.toString()
+            }
+        }
+
         vibrator = requireContext().getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
 
         handler = Handler()
 
         setupListeners()
 
+        requireActivity().onBackPressedDispatcher.addCallback(
+            viewLifecycleOwner,
+            object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    saveCounterItem()
+                    counterViewModel.update(counterItem)
+                    isEnabled = false
+                    requireActivity().onBackPressed() // Передаем управление системе
+                }
+            }
+        )
+
+
         return binding.root
     }
 
     private fun setupListeners() {
-        binding.openSettingsBtn.setOnClickListener {
-            navController.navigate(R.id.action_gestureCounterFragment_to_appAboutFragment2)
-            saveCounterItem()
-            counterViewModel.update(counterItem)
-        }
 
         binding.deleteCounter.setOnClickListener {
             removeCounterAlert()
@@ -213,7 +241,7 @@ class GestureCounterFragment : Fragment() {
         })
     }
 
-    private fun saveCounterItem() {
+    /*private fun saveCounterItem() {
         /*counterItem = CounterItem(
             binding.counterTitle.text.toString(),
             binding.counterTarget.text.toString().toInt(),
@@ -225,10 +253,63 @@ class GestureCounterFragment : Fragment() {
             progress = counter
         }
 
+        counterViewModel = ViewModelProvider(
+            this,
+            ViewModelProvider.AndroidViewModelFactory.getInstance(requireActivity().application)
+        ).get(CounterViewModel::class.java)
+
+        counterViewModel.currentCounter?.observe(viewLifecycleOwner) { item ->
+            item?.let {
+                binding.counterTitle.setText(it.title)
+                binding.counterTarget.setText(it.target.toString())
+                counter = it.progress
+                binding.gestureCounter.text = counter.toString()
+            }
+        }
+
         // saveText()
 
         counterViewModel.update(counterItem)
+    }*/
+
+    private fun saveCounterItem() {
+        // Обновляем данные counterItem из текущих значений интерфейса
+        counterItem.apply {
+            title = binding.counterTitle.text.toString()
+            target = binding.counterTarget.text.toString().toIntOrNull() ?: 0 // Обработка некорректного ввода
+            progress = counter
+        }
+
+        // Получаем ViewModel только один раз, чтобы избежать повторного создания
+        if (!::counterViewModel.isInitialized) {
+            counterViewModel = ViewModelProvider(
+                requireActivity(),
+                ViewModelProvider.AndroidViewModelFactory.getInstance(requireActivity().application)
+            ).get(CounterViewModel::class.java)
+        }
+
+        // Сохраняем изменения через ViewModel
+        counterViewModel.update(counterItem)
+        counterViewModel.currentCounter?.value?.let {
+            binding.counterTitle.setText(it.title)
+            binding.counterTarget.setText(it.target.toString())
+            counter = it.progress
+            binding.gestureCounter.text = counter.toString()
+        }
+
+
+        // Обновляем UI, если ViewModel изменилась
+        counterViewModel.currentCounter?.removeObservers(viewLifecycleOwner) // Убираем старых наблюдателей
+        counterViewModel.currentCounter?.observe(viewLifecycleOwner) { item ->
+            item?.let {
+                binding.counterTitle.setText(it.title)
+                binding.counterTarget.setText(it.target.toString())
+                counter = it.progress
+                binding.gestureCounter.text = counter.toString()
+            }
+        }
     }
+
 
     @SuppressLint("MissingPermission")
     private fun onResetCounterAlert() {
@@ -250,8 +331,6 @@ class GestureCounterFragment : Fragment() {
             .setMessage("Нажатие на экран: +1 \n Свайп вниз: -1 \n Долгое нажатие на экран: обновление счетчика до 0")
             .setPositiveButton("Понял") { _, _ ->
                 vibrator.vibrate(200)
-                counter = 0
-                binding.gestureCounter.text = "0"
                 Snackbar.make(binding.root, "Я рад за тебя", Snackbar.LENGTH_SHORT).show()
             }
             .setNeutralButton("Не понял") { dialog, _ ->
@@ -277,39 +356,89 @@ class GestureCounterFragment : Fragment() {
             .show()
     }
 
-
-    override fun onSaveInstanceState(outState: Bundle) {
-        saveCounterItem()
-        super.onSaveInstanceState(outState)
+    private fun observeCounter() {
+        // Подписка на данные ViewModel
+        counterViewModel.currentCounter?.observe(viewLifecycleOwner) { item ->
+            item?.let {
+                binding.counterTitle.setText(it.title)
+                binding.counterTarget.setText(it.target.toString())
+                counter = it.progress
+                binding.gestureCounter.text = counter.toString()
+            }
+        }
     }
 
-    override fun onStop() {
-        saveCounterItem()
-        super.onStop()
 
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        observeCounter() // Подписка на обновления данных ViewModel
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+
+        super.onSaveInstanceState(outState)
+        saveCounterItem()
+        observeCounter()
+
+        outState.putString("counterTitle", binding.counterTitle.text.toString())
+        outState.putInt("counterTarget", binding.counterTarget.text.toString().toIntOrNull() ?: 0)
+        outState.putInt("counter", counter)
+    }
+
+    override fun onViewStateRestored(savedInstanceState: Bundle?) {
+        super.onViewStateRestored(savedInstanceState)
+        if (savedInstanceState != null) {
+            // Восстанавливаем данные из Bundle
+            binding.counterTitle.setText(savedInstanceState.getString("counterTitle"))
+            binding.counterTarget.setText(savedInstanceState.getInt("counterTarget").toString())
+            counter = savedInstanceState.getInt("counter")
+            binding.gestureCounter.text = counter.toString()
+        }
+        saveCounterItem()
+        observeCounter()
+    }
+
+
+    override fun onStop() {
+
+        super.onStop()
+        saveCounterItem()
+        observeCounter()
     }
 
     override fun onPause() {
-        saveCounterItem()
-        super.onPause()
 
+        super.onPause()
+        saveCounterItem()
+        observeCounter()
+    }
+
+    override fun onResume() {
+
+        super.onResume()
+        saveCounterItem()
+        observeCounter()
     }
 
     override fun onDestroyView() {
-        saveCounterItem()
-        super.onDestroyView()
 
+        super.onDestroyView()
+        saveCounterItem()
+        observeCounter()
     }
 
     override fun onDestroy() {
-        saveCounterItem()
-        super.onDestroy()
 
+        super.onDestroy()
+        saveCounterItem()
+        observeCounter()
     }
 
     override fun onDetach() {
-        saveCounterItem()
-        super.onDetach()
 
+        super.onDetach()
+        saveCounterItem()
+        observeCounter()
     }
 }

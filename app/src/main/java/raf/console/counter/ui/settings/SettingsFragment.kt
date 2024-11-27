@@ -12,10 +12,13 @@ import android.widget.CompoundButton
 import android.widget.RadioGroup
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.color.DynamicColors
 import com.google.android.material.switchmaterial.SwitchMaterial
 import raf.console.counter.R
 import raf.console.counter.databinding.FragmentSettingsBinding
+import raf.console.counter.domain.models.CounterItem
+import raf.console.counter.ui.counter.viewmodel.CounterViewModel
 import raf.console.counter.util.SharedPreferencesUtils
 
 

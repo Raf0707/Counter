@@ -1,6 +1,7 @@
 package raf.console.counter.util;
 
-import raf.console.counter.util.CallbackInterface;public class CallBack {
+import raf.console.counter.util.CallbackInterface;
+public class CallBack {
     public static void addCallback(CallbackInterface callback){
         CallbackInterface.callbacks.add(callback);
     }

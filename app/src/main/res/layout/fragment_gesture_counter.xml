@@ -9,15 +9,32 @@
     android:layout_marginTop="20dp"
     tools:context=".ui.counter.fragment.GestureCounterFragment">
 
-    <Button
-        android:id="@+id/openSettingsBtn"
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/openTutorialBtn"
+        style="@style/Widget.Material3.Button.IconButton"
         android:layout_width="50dp"
         android:layout_height="50dp"
-        android:background="@drawable/ic_baseline_settings_24"
+        app:cornerRadius="28dp"
+        app:icon="@drawable/ic_vector_info"
+        app:iconGravity="textEnd"
+        app:iconSize="50dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.778"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.022" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/editCounter"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:background="@drawable/ic_baseline_edit_24"
+        android:visibility="visible"
         app:cornerRadius="28dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.847"
+        app:layout_constraintHorizontal_bias="0.598"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.022" />
@@ -33,7 +50,7 @@
         app:iconSize="50dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.144"
+        app:layout_constraintHorizontal_bias="0.246"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.022" />
@@ -50,37 +67,7 @@
         app:iconSize="50dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.315"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.022" />
-
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/editCounter"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:background="@drawable/ic_baseline_edit_24"
-        android:visibility="visible"
-        app:cornerRadius="28dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.495"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.022" />
-
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/openTutorialBtn"
-        style="@style/Widget.Material3.Button.IconButton"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        app:cornerRadius="28dp"
-        app:icon="@drawable/ic_vector_info"
-        app:iconGravity="textEnd"
-        app:iconSize="50dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.675"
+        app:layout_constraintHorizontal_bias="0.418"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.022" />

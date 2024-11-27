@@ -69,9 +69,9 @@
     </style>
 
     <style name="Alert.Button.Positive" parent="Widget.MaterialComponents.Button.TextButton">
-        <item name="backgroundTint">@color/purple_300</item>
-        <item name="rippleColor">@color/purple_300</item>
-        <item name="android:textColor">@android:color/white</item>
+        <item name="backgroundTint">@color/md_theme_primary</item>
+        <item name="rippleColor">@color/md_theme_primary</item>
+        <item name="android:textColor">#097023</item>
         <item name="android:textSize">14sp</item>
         <item name="android:textAllCaps">false</item>
     </style>

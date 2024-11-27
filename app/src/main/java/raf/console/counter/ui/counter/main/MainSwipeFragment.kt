@@ -52,41 +52,6 @@ class MainSwipeFragment : Fragment(), CounterAdapter.HandleCounterClick {
         counterViewModel = ViewModelProvider(this)
             .get(CounterViewModel::class.java)
 
-        arguments?.let {
-            combinedWord = it.getString("wordAndTranslation", "")
-            targetValue = it.getInt("value", 200)
-        }
-
-        // Проверка, переданы ли аргументы для создания нового счетчика
-        if (combinedWord.isNotEmpty()) {
-            // Проверить, существует ли уже счетчик с таким title
-            val liveData = counterViewModel?.findByTitle(combinedWord)
-            liveData?.observe(viewLifecycleOwner, { existingCounters ->
-                if (existingCounters.isNullOrEmpty()) {
-                    // Счетчика с таким названием нет, создаем новый
-                    val newCounterItem = CounterItem(
-                        //id = 0, // ID можно будет обновить после сохранения в базе данных, если нужно
-                        combinedWord,
-                        targetValue,
-                        0
-                    )
-
-                    // Вставка нового счетчика в базу данных
-                    counterViewModel?.insert(newCounterItem)
-
-                    // Устанавливаем новый счетчик для редактирования и открываем Material Alert
-                    counterForEdit = newCounterItem
-                    onMaterialAlert(true)
-
-                    // Удалить наблюдатель после первого срабатывания
-                    liveData.removeObservers(viewLifecycleOwner)
-                } else {
-                    // Счетчик с таким названием уже существует, выводим уведомление
-                    Snackbar.make(binding.root, "Счетчик с таким названием уже существует", Snackbar.LENGTH_SHORT).show()
-                }
-            })
-        }
-
 
         arguments?.let {
             title = it.getString("title", counterItem?.title ?: "")
